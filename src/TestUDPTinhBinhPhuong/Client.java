@@ -1,4 +1,4 @@
-package Test;
+package TestUDPTinhBinhPhuong;
 
 import java.net.*;
 import java.util.Scanner;

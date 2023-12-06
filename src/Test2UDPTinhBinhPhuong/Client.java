@@ -1,4 +1,4 @@
-package Test2;
+package Test2UDPTinhBinhPhuong;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

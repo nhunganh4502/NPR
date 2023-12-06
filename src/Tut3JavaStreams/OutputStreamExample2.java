@@ -7,10 +7,10 @@ public class OutputStreamExample2 {
 
     public static void main(String[] args) {
         try {
-            File dir = new File("./Test");
+            File dir = new File("./TestUDPTinhBinhPhuong");
             dir.mkdirs();
 
-            OutputStream os = new FileOutputStream("./Test/test_writerOutputStream.txt");
+            OutputStream os = new FileOutputStream("./TestUDPTinhBinhPhuong/test_writerOutputStream.txt");
 
             byte[] by = new byte[] { 'H', 'e', 'l', 'l', 'o', ' ', 31, 34, 92, 10 }; //10 = "\n" new line , 31 = control code chart , 34 = """ , 92 = "\"
 

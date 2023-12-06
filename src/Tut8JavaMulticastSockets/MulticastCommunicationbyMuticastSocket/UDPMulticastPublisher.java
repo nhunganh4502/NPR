@@ -1,4 +1,4 @@
-package Tut8JavaMulticastSockets;
+package Tut8JavaMulticastSockets.MulticastCommunicationbyMuticastSocket;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

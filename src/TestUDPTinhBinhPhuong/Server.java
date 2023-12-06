@@ -1,4 +1,4 @@
-package Test;
+package TestUDPTinhBinhPhuong;
 import java.math.BigInteger;
 import java.net.*;
 

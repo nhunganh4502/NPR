@@ -1,4 +1,4 @@
-package Tut5JavaTCPSocket;
+package Tut5JavaTCPSocket.UpperCase;
 
 import java.io.*;
 import java.net.*;
