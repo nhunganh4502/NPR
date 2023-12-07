@@ -1,59 +1,56 @@
 package Final.MulticastSocket;
 
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
+import java.net.*;
 import java.util.Scanner;
 
 public class BigIntegerClient {
     public static void main(String[] args) {
         try {
+            // Create a multicast socket on port 20006
+            MulticastSocket clientSocket = new MulticastSocket(20006);
             InetAddress group = InetAddress.getByName("224.0.0.1");
-            int port = 10006;
+            clientSocket.joinGroup(group);
 
-            MulticastSocket multicastSocket = new MulticastSocket(port);
-            multicastSocket.joinGroup(group);
-
-            System.out.println("Multicast client is ready...");
-
-            // Read the initial message from the user
-            System.out.print("Enter the initial message: ");
+            // Use Scanner to read input from the keyboard
             Scanner scanner = new Scanner(System.in);
-            String initialMessage = scanner.nextLine();
 
-            // Send the initial message to the server
-            byte[] initialData = initialMessage.getBytes();
-            DatagramPacket initialPacket = new DatagramPacket(initialData, initialData.length, group, port);
-            multicastSocket.send(initialPacket);
+            // Send the first message "[abc]" to the server
+            sendData(clientSocket, group, "[abc]");
 
-            // Receive and print the first reply from the server
-            byte[] replyData = new byte[1024];
-            DatagramPacket replyPacket = new DatagramPacket(replyData, replyData.length);
-            multicastSocket.receive(replyPacket);
+            // Receive and print the first reply from server (2x[abc])
+            String response = receiveData(clientSocket);
+            System.out.println(response);
 
-            String firstReply = new String(replyPacket.getData(), 0, replyPacket.getLength());
-            System.out.println("Server's reply: " + firstReply);
-
-            // Client main loop
+            // Loop for client
             while (true) {
-                // Read a message from the user's keyboard
+                // Read a message from user keyboard
                 System.out.print("Enter a message: ");
-                String clientMessage = scanner.nextLine();
+                String userInput = scanner.nextLine();
 
-                // Send the message to the server
-                byte[] clientData = clientMessage.getBytes();
-                DatagramPacket clientPacket = new DatagramPacket(clientData, clientData.length, group, port);
-                multicastSocket.send(clientPacket);
+                // Send the message to server
+                sendData(clientSocket, group, userInput);
 
-                // Receive and print the server's reply
-                multicastSocket.receive(replyPacket);
-                String serverReply = new String(replyPacket.getData(), 0, replyPacket.getLength());
-                System.out.println("Server's reply: " + serverReply);
+                // Receive and print the response from server
+                String serverResponse = receiveData(clientSocket);
+                System.out.println("Server response: " + serverResponse);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void sendData(MulticastSocket socket, InetAddress group, String message) throws IOException {
+        byte[] sendData = message.getBytes();
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, group, 20006);
+        socket.send(sendPacket);
+    }
+
+    private static String receiveData(MulticastSocket socket) throws IOException {
+        byte[] receiveData = new byte[1024];
+        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+        socket.receive(receivePacket);
+        return new String(receivePacket.getData(), 0, receivePacket.getLength());
     }
 }

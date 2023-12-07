@@ -1,42 +1,49 @@
 package Final.MulticastSocket;
 
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.util.Arrays;
+import java.net.*;
 
 public class BigIntegerServer {
     public static void main(String[] args) {
         try {
+            // Create a multicast socket on port 20006
+            MulticastSocket serverSocket = new MulticastSocket(20006);
             InetAddress group = InetAddress.getByName("224.0.0.1");
-            int port = 10006;
+            serverSocket.joinGroup(group);
 
-            MulticastSocket multicastSocket = new MulticastSocket(port);
-            multicastSocket.joinGroup(group);
-
-            System.out.println("Multicast server is ready...");
-
-            byte[] buffer = new byte[1024];
-
+            // Loop for server
             while (true) {
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-                multicastSocket.receive(packet);
+                byte[] receiveData = new byte[1024];
+                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                serverSocket.receive(receivePacket);
+                String clientMessage = new String(receivePacket.getData(), 0, receivePacket.getLength());
 
-                String clientMessage = new String(packet.getData(), 0, packet.getLength());
-                System.out.println("Received from client: " + clientMessage);
-
-                // Process the first message (2 times of [abc])
-                BigInteger result = new BigInteger(clientMessage).multiply(BigInteger.valueOf(2));
-
-                // Send the result back to the client
-                byte[] replyData = result.toString().getBytes();
-                DatagramPacket replyPacket = new DatagramPacket(replyData, replyData.length, group, port);
-                multicastSocket.send(replyPacket);
+                if (clientMessage.equals("[abc]")) {
+                    // Calculate 2 times of [abc]
+                    BigInteger value = new BigInteger("[abc]").multiply(BigInteger.valueOf(2));
+                    sendData(serverSocket, group, value.toString());
+                } else {
+                    try {
+                        // Check if the message is a positive integer
+                        BigInteger number = new BigInteger(clientMessage);
+                        // Calculate the square of [number]
+                        BigInteger square = number.multiply(number);
+                        sendData(serverSocket, group, square.toString());
+                    } catch (NumberFormatException e) {
+                        // Not a positive integer, send the client's message back
+                        sendData(serverSocket, group, clientMessage);
+                    }
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void sendData(MulticastSocket socket, InetAddress group, String message) throws IOException {
+        byte[] sendData = message.getBytes();
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, group, 20006);
+        socket.send(sendPacket);
     }
 }
